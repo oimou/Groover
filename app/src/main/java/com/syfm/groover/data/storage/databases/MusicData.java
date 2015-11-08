@@ -55,6 +55,14 @@ public class MusicData extends Model {
                 .execute();
     }
 
+    public static List<ResultData> getAllResultDataReverse(MusicData musicData) {
+        return new Select()
+                .from(ResultData.class)
+                .where(Const.TABLE_NAME_MUSIC_DATA + " = ?", musicData.getId())
+                .orderBy("Id desc")
+                .execute();
+    }
+
     public static List<UserRank> getAllRank(MusicData musicData) {
         return new Select()
                 .from(UserRank.class)

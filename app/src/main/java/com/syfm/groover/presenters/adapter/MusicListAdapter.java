@@ -15,9 +15,11 @@ import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.syfm.groover.R;
 import com.syfm.groover.data.network.CustomImageLoader;
+import com.syfm.groover.data.storage.databases.MusicData;
 import com.syfm.groover.data.storage.databases.ResultData;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import butterknife.Bind;
@@ -26,12 +28,12 @@ import butterknife.ButterKnife;
 /**
  * Created by lycoris on 2015/10/09.
  */
-public class MusicListAdapter extends ArrayAdapter<List<ResultData>> {
+public class MusicListAdapter extends ArrayAdapter<MusicData> {
     private LayoutInflater inflater = null;
-    private ArrayList<List<ResultData>> list;
+    private List<MusicData> list;
     private Context context;
 
-    public MusicListAdapter(Context context, int resource, ArrayList<List<ResultData>> list, RequestQueue queue) {
+    public MusicListAdapter(Context context, int resource, List<MusicData> list, RequestQueue queue) {
         super(context, resource, list);
         this.context = context;
         this.inflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -63,48 +65,50 @@ public class MusicListAdapter extends ArrayAdapter<List<ResultData>> {
          */
 
 
-        List<ResultData> row = getItem(position);
+        MusicData row = getItem(position);
+        List<ResultData> rowResult = row.result();
 
-        holder.tv_title.setText(row.get(0).musicData.music_title);
-        holder.tv_simple_rate.setText(row.get(0).rating);
-        holder.tv_simple_score.setText(String.valueOf(row.get(0).score));
-        holder.tv_normal_rate.setText(row.get(1).rating);
-        holder.tv_normal_score.setText(String.valueOf(row.get(1).score));
-        holder.tv_hard_rate.setText(row.get(2).rating);
-        holder.tv_hard_score.setText(String.valueOf(row.get(2).score));
+        holder.tv_title.setText(row.music_title);
+        holder.tv_simple_rate.setText(rowResult.get(0).rating);
+        holder.tv_simple_score.setText(String.valueOf(rowResult.get(0).score));
+        holder.tv_normal_rate.setText(rowResult.get(1).rating);
+        holder.tv_normal_score.setText(String.valueOf(rowResult.get(1).score));
+        holder.tv_hard_rate.setText(rowResult.get(2).rating);
+        holder.tv_hard_score.setText(String.valueOf(rowResult.get(2).score));
 
         //Extraを表示させるか
-        if(row.get(0).musicData.ex_flag == 1) {
+        if(row.ex_flag == 1) {
             holder.ll_extra.setVisibility(View.VISIBLE);
-            holder.tv_extra_rate.setText(row.get(3).rating);
-            holder.tv_extra_score.setText(String.valueOf(row.get(3).score));
+            holder.tv_extra_rate.setText(rowResult.get(3).rating);
+            holder.tv_extra_score.setText(String.valueOf(rowResult.get(3).score));
         }
 
         //FullChainを表示させるか (fullchainはFullChainした回数)
-        if (row.get(0).full_chain > 0) {
+        if (rowResult.get(0).full_chain > 0) {
             holder.tv_simple_score.setBackgroundResource(R.drawable.full_chain_border);
-        } else if(row.get(0).no_miss > 0) {
+        } else if(rowResult.get(0).no_miss > 0) {
             holder.tv_simple_score.setBackgroundResource(R.drawable.no_miss_border);
         }
-        if (row.get(1).full_chain > 0) {
+        if (rowResult.get(1).full_chain > 0) {
             holder.tv_normal_score.setBackgroundResource(R.drawable.full_chain_border);
-        } else if(row.get(1).no_miss > 0) {
+        } else if(rowResult.get(1).no_miss > 0) {
             holder.tv_normal_score.setBackgroundResource(R.drawable.no_miss_border);
         }
-        if (row.get(2).full_chain > 0) {
+        if (rowResult.get(2).full_chain > 0) {
             holder.tv_hard_score.setBackgroundResource(R.drawable.full_chain_border);
-        } else if(row.get(2).no_miss > 0) {
+        } else if(rowResult.get(2).no_miss > 0) {
             holder.tv_hard_score.setBackgroundResource(R.drawable.no_miss_border);
         }
-        if (row.get(3).full_chain > 0 && row.get(3).musicData.ex_flag == 1) {
+        if (rowResult.get(3).full_chain > 0 && rowResult.get(3).musicData.ex_flag == 1) {
             holder.tv_extra_score.setBackgroundResource(R.drawable.full_chain_border);
-        } else if(row.get(3).no_miss > 0 && row.get(3).musicData.ex_flag == 1) {
+        } else if(rowResult.get(3).no_miss > 0 && rowResult.get(3).musicData.ex_flag == 1) {
             holder.tv_extra_score.setBackgroundResource(R.drawable.no_miss_border);
         }
 
 
+
         //いっぱい読込すると落ちるかもしれない
-        Bitmap bmp = BitmapFactory.decodeByteArray(row.get(0).musicData.music_thumbnail, 0, row.get(0).musicData.music_thumbnail.length);
+        Bitmap bmp = BitmapFactory.decodeByteArray(rowResult.get(0).musicData.music_thumbnail, 0, rowResult.get(0).musicData.music_thumbnail.length);
         holder.iv_thumb.setImageBitmap(bmp);
 
         return view;
@@ -158,5 +162,9 @@ public class MusicListAdapter extends ArrayAdapter<List<ResultData>> {
         holder.tv_extra_score.setBackgroundResource(0);
         holder.ll_extra.setVisibility(View.GONE);
         holder.iv_thumb.setImageBitmap(null);
+    }
+
+    public void sortData() {
+        //list = MusicData.getAllResultDataReverse(list.get(0).get(0).musicData.music_id);
     }
 }

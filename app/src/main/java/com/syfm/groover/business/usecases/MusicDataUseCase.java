@@ -18,9 +18,9 @@ public class MusicDataUseCase implements ApiClient.MusicDataCallback {
     // MusicDataを通知するためのクラス
     // MusicDataFragmentへ通知
     public class MusicDataEvent {
-        public final ArrayList<List<ResultData>> resultData;
-        public MusicDataEvent(ArrayList<List<ResultData>> resultData) {
-            this.resultData = resultData;
+        public final List<MusicData> musicData;
+        public MusicDataEvent(List<MusicData> musicData) {
+            this.musicData = musicData;
         }
     }
 
@@ -38,12 +38,8 @@ public class MusicDataUseCase implements ApiClient.MusicDataCallback {
     }
 
     public void getMusicData() {
-        ArrayList<List<ResultData>> result = new ArrayList<>();
         List<MusicData> musicData = new Select().from(MusicData.class).orderBy("Id desc").execute();
-        for (MusicData row : musicData) {
-            result.add(MusicData.getAllResultData(row));
-        }
-        EventBus.getDefault().post(new MusicDataEvent(result));
+        EventBus.getDefault().post(new MusicDataEvent(musicData));
     }
 
     public void isSuccess(Boolean success) {
